@@ -1,317 +1,245 @@
+#!/usr/bin/env python2
+# coding: utf-8
+
 from Tkinter import *
 from random import randint
 from PIL import Image, ImageTk
-root = Tk()
-
-can = Canvas(root, width = 1920, height = 1080)
-can.grid()
-
-image = Image.open("grid.png")
-gridTexture = ImageTk.PhotoImage(image)
-
-image = Image.open("0.png")
-mine0 = ImageTk.PhotoImage(image)
-
-image = Image.open("1.png")
-mine1 = ImageTk.PhotoImage(image)
-
-image = Image.open("2.png")
-mine2 = ImageTk.PhotoImage(image)
-
-image = Image.open("3.png")
-mine3 = ImageTk.PhotoImage(image)
-
-image= Image.open("4.png")
-mine4 = ImageTk.PhotoImage(image)
-
-image = Image.open("5.png")
-mine5 = ImageTk.PhotoImage(image)
-
-image = Image.open("6.png")
-mine6 = ImageTk.PhotoImage(image)
-
-image = Image.open("7.png")
-mine7 = ImageTk.PhotoImage(image)
-
-image = Image.open("8.png")
-mine8 = ImageTk.PhotoImage(image)
-
-image = Image.open("_0.png")
-digit0 = ImageTk.PhotoImage(image)
-
-image = Image.open("_1.png")
-digit1 = ImageTk.PhotoImage(image)
-
-image = Image.open("_2.png")
-digit2 = ImageTk.PhotoImage(image)
-
-image = Image.open("_3.png")
-digit3 = ImageTk.PhotoImage(image)
-
-image= Image.open("_4.png")
-digit4 = ImageTk.PhotoImage(image)
-
-image = Image.open("_5.png")
-digit5 = ImageTk.PhotoImage(image)
-
-image = Image.open("_6.png")
-digit6 = ImageTk.PhotoImage(image)
-
-image = Image.open("_7.png")
-digit7 = ImageTk.PhotoImage(image)
-
-image = Image.open("_8.png")
-digit8 = ImageTk.PhotoImage(image)
-
-image = Image.open("_9.png")
-digit9 = ImageTk.PhotoImage(image)
-
-image = Image.open("flag.png")
-flag = ImageTk.PhotoImage(image)
-
-image = Image.open("mine.png")
-mineTexture = ImageTk.PhotoImage(image)
-
-global grid
-grid=[ [0 for i in range (20)] for j in range(20)]
-
-global playerGrid
-playerGrid=[ [11 for i in range (20)] for j in range(20)]
+from os.path import join
+from random import randint
+from tkMessageBox import *
+import datetime
 
 
+class Assets:
+    def __init__(self, folder="assets"):
+        self.folder = folder
+        self.digits = []
+        self.values = []
+        self.mine = ""
+        self.flag = ""
+        self.grid = ""
+        self.smiley = ""
+        self.smiley_down = ""
 
-mines = 0
-
-while mines != 50:
-    x = randint(0, 19)
-    y = randint(0, 19)
-    if grid[x][y] == 0:
-        mines += 1
-        grid[x][y] = 9 #Les 9 sont des mines, les autres chiffres sont le nombre de mines qui entourent la case
-
-global mineCountdown
-mineCountdown = mines
-
-can.create_image(25 * 50, 10 * 50, anchor = NW, image=digit5)
-can.create_image(25 * 50 + 50, 10 * 50, anchor = NW, image=digit0)
-
-def drawGrid():
-    for j in range(20):
-        for i in range (20):
-            can.create_image(j * 50, i * 50, anchor = NW, image=gridTexture)
-
-def showMines():
-
-    i = -1
-    for column in grid:
-        i+=1
-        j = -1
-        for frame in column:
-            j+=1
-            if frame == 0:
-                counter = mines(i, j)
-                
-                if counter != 0:
-                    grid[i][j] = counter
-        
-def mines(i, j):
-
-    counter = 0 
-    if i+1 <= 19:
-        if grid[i+1][j] == 9:
-            counter+=1
-    if i+1 <= 19 and j+1 <= 19:
-        if grid[i+1][j+1] == 9:
-            counter+=1
-    if j+1 <= 19:
-        if grid[i][j+1] == 9:
-            counter+=1
-    if 0 <= i-1 and 0 <= j-1:        
-        if grid[i-1][j-1] == 9:
-            counter+=1
-    if 0 <= i-1:
-        if grid[i-1][j] == 9:
-            counter+=1
-    if 0 <= j-1:
-        if grid[i][j-1] == 9:
-            counter+=1
-    if 0 <= i-1 and j+1 <= 19:
-        if grid[i-1][j+1] == 9:
-            counter+=1
-    if 0 <= j-1 and i+1 <= 19:
-        if grid[i+1][j-1] == 9:
-            counter+=1
-
-    return counter
-    
-    
-def rightClick(evt):
-
-    global mineCountdown
-    
-    j = int(evt.x / 50)
-    i = int(evt.y / 50)
-    if playerGrid[i][j] == "flag":
-        playerGrid[i][j] = 11
-        can.create_image(j * 50, i * 50, anchor = NW, image=gridTexture)
-        mineCountdown += 1
-        
-    elif playerGrid[i][j] == 11:
-        can.create_image(j * 50, i * 50, anchor = NW, image=flag)
-        playerGrid[i][j] = "flag"
-        mineCountdown -= 1
-
-    showMinesLeft()
-
-    
-    
-def leftClick(evt):
-    j = int(evt.x / 50)
-    i = int(evt.y / 50)
-    x = whatDigit(i, j)
-    if x == 0:
-        spread(i,j)
-    else:
-        printMines(i, j)
-
-def showMinesLeft():
-
-    firstDigit = mineCountdown/10
-    lastDigit = mineCountdown%10
-    
-    if firstDigit == 9:
-        can.create_image(25 * 50, 10 * 50, anchor = NW, image=digit9)
-    elif firstDigit == 8:
-        can.create_image(25 * 50, 10 * 50, anchor = NW, image=digit8)
-    elif firstDigit == 7:
-        can.create_image(25 * 50, 10 * 50, anchor = NW, image=digit7)
-    elif firstDigit == 6:
-        can.create_image(25 * 50, 10 * 50, anchor = NW, image=digit6)
-    elif firstDigit == 5:
-        can.create_image(25 * 50, 10 * 50, anchor = NW, image=digit5)
-    elif firstDigit == 4:
-        can.create_image(25 * 50, 10 * 50, anchor = NW, image=digit4)
-    elif firstDigit == 3:
-        can.create_image(25 * 50, 10 * 50, anchor = NW, image=digit3)
-    elif firstDigit ==2:
-        can.create_image(25 * 50, 10 * 50, anchor = NW, image=digit2)
-    elif firstDigit == 1:
-        can.create_image(25 * 50, 10 * 50, anchor = NW, image=digit1)
-    elif firstDigit == 0:
-        can.create_image(25 * 50, 10 * 50, anchor = NW, image=digit0)
-
-    if lastDigit == 9:
-        can.create_image(25 * 50 + 50, 10 * 50, anchor = NW, image=digit9)
-    elif lastDigit == 8:
-        can.create_image(25 * 50 + 50, 10 * 50, anchor = NW, image=digit8)
-    elif lastDigit == 7:
-        can.create_image(25 * 50 + 50, 10 * 50, anchor = NW, image=digit7)
-    elif lastDigit == 6:
-        can.create_image(25 * 50 + 50, 10 * 50, anchor = NW, image=digit6)
-    elif lastDigit == 5:
-        can.create_image(25 * 50 + 50, 10 * 50, anchor = NW, image=digit5)
-    elif lastDigit == 4:
-        can.create_image(25 * 50 + 50, 10 * 50, anchor = NW, image=digit4)
-    elif lastDigit == 3:
-        can.create_image(25 * 50 + 50, 10 * 50, anchor = NW, image=digit3)
-    elif lastDigit == 2:
-        can.create_image(25 * 50 + 50, 10 * 50, anchor = NW, image=digit2)
-    elif lastDigit == 1:
-        can.create_image(25 * 50 + 50, 10 * 50, anchor = NW, image=digit1)
-    elif lastDigit == 0:
-        can.create_image(25 * 50 + 50, 10 * 50, anchor = NW, image=digit0)
-
-    
-def printMines(i, j):
-
-    x = grid[i][j]
-
-    if x == 1:
-        can.create_image(j * 50, i * 50, anchor = NW, image=mine1)
-        playerGrid[i][j] = 1
-    if x == 2:
-        can.create_image(j * 50, i * 50, anchor = NW, image=mine2)
-        playerGrid[i][j] = 2
-    if x == 3:
-        can.create_image(j * 50, i * 50, anchor = NW, image=mine3)
-        playerGrid[i][j] = 3
-    if x == 4:
-        can.create_image(j * 50, i * 50, anchor = NW, image=mine4)
-        playerGrid[i][j] = 4
-    if x == 5:
-        can.create_image(j * 50, i * 50, anchor = NW, image=mine5)
-        playerGrid[i][j] = 5
-    if x == 6:
-        can.create_image(j * 50, i * 50, anchor = NW, image=mine6)
-        playerGrid[i][j] = 6
-    if x == 7:
-        can.create_image(j * 50, i * 50, anchor = NW, image=mine7)
-        playerGrid[i][j] = 7
-    if x == 8:
-        can.create_image(j * 50, i * 50, anchor = NW, image=mine8)
-        playerGrid[i][j] = 8
-    if x == 9:
-        playerGrid[i][j] = 9
-        can.create_image(j * 50, i * 50, anchor = NW, image=mineTexture)
+    def load_assets(self):
+        for id in range(0, 10):
+            asset_path = join(self.folder, "_%s.png" % id)
+            self.digits.append(ImageTk.PhotoImage(Image.open(asset_path)))
+            if id != 9:
+                asset_path = join(self.folder, "%s.png" % id)
+                self.values.append(ImageTk.PhotoImage(Image.open(asset_path)))
+        self.mine = ImageTk.PhotoImage(
+            Image.open(join(self.folder, "mine.png")))
+        self.grid = ImageTk.PhotoImage(
+            Image.open(join(self.folder, "grid.png")))
+        self.flag = ImageTk.PhotoImage(
+            Image.open(join(self.folder, "flag.png")))
+        self.smiley = ImageTk.PhotoImage(
+            Image.open(join(self.folder, "smiley.png")))
+        self.smiley_down = ImageTk.PhotoImage(
+            Image.open(join(self.folder, "smiley_down.png")))
 
 
-def whatDigit(i, j):
-    x = grid[i][j]
-    return x
+class Demineur:
+    def __init__(self, assets, width=1920, height=1080, sprite_size=50, grid_size=16, mines=50):
+        self.sprite_size = sprite_size
+        self.number_mines = mines
+        self.number_mines_bckup = mines
+        self.grid_size = grid_size
+        self.mines = mines
+        self.root = Tk()
+        self.assets = assets
+        self.assets.load_assets()
+        self.game_frame = None
+        self.setup_window()
+        self.start_time = None
+        self.start_game()
+        self.update_clock()
 
-def spread(i ,j):
+    def update_clock(self):
+        if not self.start_time:
+            return
+        now = datetime.datetime.now() - self.start_time
+        minutes, secondes = now.seconds // 60, now.seconds % 60
+        digit_one, digit_two = minutes // 10, minutes % 10
+        digit_three, digit_four = secondes // 10, secondes % 10
 
-    can.create_image(j * 50, i * 50, anchor = NW, image=mine0)
-    if playerGrid[i][j] !=0:
-        
-        playerGrid[i][j] = 0
-        if i < 19:
-            if grid[i+1][j] == 0:
-                spread(i+1, j)
-            else:
-                printMines(i+1, j)
-        if j < 19:
-            if grid[i][j+1] == 0:
-                spread(i, j+1)
-            else:
-                printMines(i, j+1)
-        if i > 0:
-            if grid[i-1][j] == 0:
-                spread(i-1, j)
-            else:
-                printMines(i-1, j)
-        if j > 0:
-            if grid[i][j-1] == 0:
-                spread(i, j-1)
-            else:
-                printMines(i, j-1)
-        if i < 19 and j < 19:
-            if grid[i+1][j+1] == 0:
-                spread(i+1, j+1)
-            else:
-                printMines(i+1, j+1)
-        if i < 19 and j > 0:
-            if grid[i+1][j-1] == 0:
-                spread(i+1, j-1)
-            else:
-                printMines(i+1, j-1)
-        if i > 0 and j > 0:
-            if grid[i-1][j-1] == 0:
-                spread(i-1, j-1)
-            else:
-                printMines(i-1, j-1)
-        if i > 0 and j < 19:
-            if grid[i-1][j+1] == 0:
-                spread(i-1,j+1)
-            else:
-                printMines(i-1, j+1)
+        self.canvas2.create_image(self.grid_size*self.sprite_size-25, 0, anchor=NW, image=self.assets.digits[digit_four])
+        self.canvas2.create_image(self.grid_size*self.sprite_size-50, 0, anchor=NW, image=self.assets.digits[digit_three])
+        self.canvas2.create_image(self.grid_size*self.sprite_size-85, 0, anchor=NW, image=self.assets.digits[digit_two])
+        self.canvas2.create_image(self.grid_size*self.sprite_size-110, 0, anchor=NW, image=self.assets.digits[digit_one])
 
-drawGrid()
-showMines()
-for i in grid:
-    print i
-    
-can.bind("<Button-3>", rightClick)
-can.bind("<Button-1>", leftClick)
+        self.root.after(1000, self.update_clock)
 
-root.mainloop()
+    def start_game(self):
+        if hasattr(self, 'canvas'):
+            self.canvas.destroy()
+            self.start_time = None
+
+        self.number_mines = self.number_mines_bckup
+        self.show_mines_left()
+        self.grid = Grid(self.grid_size, self.mines)
+        self.player_grid = [[-1 for i in range(self.grid_size)] for j in range(self.grid_size)]
+        self.canvas = Canvas(self.game_frame, width=self.sprite_size*self.grid_size, height=self.sprite_size*self.grid_size)
+        self.canvas.grid()
+        self.draw_grid()
+        self.canvas.bind("<Button-1>", self.left_click)
+        self.canvas.bind("<Button-3>", self.right_click)
+        self.start_time = datetime.datetime.now()
+
+    def show_mines(self):
+        for i in range(self.grid_size):
+            for j in range(self.grid_size):
+                if self.grid.mat[i][j] == 9:
+                    self.canvas.create_image(j * self.sprite_size, i * self.sprite_size, anchor=NW, image=self.assets.mine)
+
+
+    def setup_window(self):
+        self.root.title("MineSweeper")
+        menubar = Menu(self.root)
+        menu1 = Menu(menubar, tearoff=0)
+        menu1.add_command(label="Quitter", command=self.root.quit)
+        menubar.add_cascade(label="Fichier", menu=menu1)
+        self.root.config(menu=menubar)
+
+        buttons_frame = Frame(self.root, borderwidth=2, relief=GROOVE)
+        buttons_frame.pack(side=TOP, padx=10, pady=10)
+
+        self.game_frame = Frame(self.root, borderwidth=2, relief=GROOVE)
+        self.game_frame.pack(anchor=CENTER, padx=10, pady=10)
+
+        self.canvas2 = Canvas(buttons_frame, width=self.sprite_size*self.grid_size, height=50)
+        self.canvas2.grid()
+        self.canvas2.create_image(self.sprite_size*self.grid_size/2, 25, image=self.assets.smiley)
+        self.canvas2.bind("<Button-1>", self.begin_game)
+        self.canvas2.bind("<ButtonRelease-1>", self.begin_game1)
+
+    def begin_game(self, event):
+        self.canvas2.create_image(self.sprite_size*self.grid_size/2, 25, image=self.assets.smiley_down)
+
+    def begin_game1(self, event):
+        self.canvas2.create_image(self.sprite_size*self.grid_size/2, 25, image=self.assets.smiley)
+        if askyesno("New game ?", "Commencer une nouvelle partie ?"):
+            self.start_game()
+
+    def left_click(self, event):
+        j, i = int(event.x / 50), int(event.y / 50)
+        if self.player_grid[i][j] == -2:
+            return
+        if not self.grid.mat[i][j]:
+            self.spread(i, j)
+        elif self.grid.mat[i][j] == self.grid.mine:
+            self.player_loses()
+        else:
+            self.update_grid(i, j)
+
+    def player_loses(self):
+        self.show_mines()
+        if askyesno("Game Over!", "Voulez-vous commencer une nouvelle partie ?"):
+            self.start_game()
+        else:
+            pass
+
+    def spread(self, x, y):
+        for i in range(x - 1, x + 2):
+            for j in range(y - 1, y + 2):
+                if i != x or j != y:
+                    if 0 <= i < self.grid_size:
+                        if 0 <= j < self.grid_size:
+                            if self.grid.mat[i][j] == 0 and self.player_grid[i][j] != 0:
+                                self.canvas.create_image(
+                                    j * self.sprite_size, i * self.sprite_size, anchor=NW, image=self.assets.values[0])
+                                self.player_grid[i][j] = 0
+                                self.spread(i, j)
+                            elif self.grid.mat[i][j] != 0:
+                                self.update_grid(i, j)
+
+    def update_grid(self, i, j):
+        for value in range(self.grid.mine):
+            if value == self.grid.mine:
+                self.canvas.create_image(
+                    j * self.sprite_size, i * self.sprite_size, anchor=NW, image=self.assets.values[value])
+                self.player_grid[i][j] = value
+            elif value == self.grid.mat[i][j]:
+                self.canvas.create_image(
+                    j * self.sprite_size, i * self.sprite_size, anchor=NW, image=self.assets.values[value])
+                self.player_grid[i][j] = value
+
+    def right_click(self, event):
+        j, i = int(event.x / 50), int(event.y / 50)
+        if self.player_grid[i][j] == -1:
+            self.canvas.create_image(
+                j * self.sprite_size, i * self.sprite_size, anchor=NW, image=self.assets.flag)
+            self.player_grid[i][j] = -2
+            self.number_mines -= 1
+        elif self.player_grid[i][j] == -2:
+            self.canvas.create_image(
+                j * self.sprite_size, i * self.sprite_size, anchor=NW, image=self.assets.grid)
+            self.player_grid[i][j] = -1
+            self.number_mines += 1
+
+        self.show_mines_left()
+
+    def show_mines_left(self):
+        first_digit = self.number_mines / 10
+        second_digit = self.number_mines % 10
+
+        self.canvas2.create_image(0, 0, anchor=NW, image=self.assets.digits[first_digit])
+        self.canvas2.create_image(25, 0, anchor=NW, image=self.assets.digits[second_digit])
+
+    def draw_grid(self):
+        for i in range(self.grid_size):
+            for j in range(self.grid_size):
+                self.canvas.create_image(j * self.sprite_size, i * self.sprite_size,
+                                         anchor=NW, image=self.assets.grid)
+
+    def run(self):
+        self.draw_grid()
+        self.root.mainloop()
+
+
+class Grid:
+    def __init__(self, size, mines):
+        self.size = size
+        self.mines = mines
+        self.mine = 9
+        self.setup_mines()
+        self.setup_mines_indicator()
+
+    def setup_mines(self):
+        self.mat = [[0 for i in range(self.size)] for j in range(self.size)]
+        mines = 0
+        while mines != self.mines:
+            x, y = randint(0, self.size - 1), randint(0, self.size - 1)
+            if not self.mat[x][y]:
+                mines += 1
+                self.mat[x][y] = self.mine
+
+    def setup_mines_indicator(self):
+        for i in range(self.size):
+            for j in range(self.size):
+                if self.mat[i][j] == self.mine:
+                    continue
+                else:
+                    self.mat[i][j] = self.test_neighbours(i, j)
+
+    def test_neighbours(self, x, y):
+        mines = 0
+        for i in range(x - 1, x + 2):
+            for j in range(y - 1, y + 2):
+                if i != x or j != y:
+                    if 0 <= i < self.size:
+                        if 0 <= j < self.size:
+                            if self.mat[i][j] == self.mine:
+                                mines += 1
+
+        return mines
+
+
+def main():
+    a = Assets()
+    d = Demineur(a)
+    d.run()
+
+if __name__ == '__main__':
+    main()
