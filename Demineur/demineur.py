@@ -10,31 +10,61 @@ image = Image.open("grid.png")
 gridTexture = ImageTk.PhotoImage(image)
 
 image = Image.open("0.png")
-digit0 = ImageTk.PhotoImage(image)
+mine0 = ImageTk.PhotoImage(image)
 
 image = Image.open("1.png")
-digit1 = ImageTk.PhotoImage(image)
+mine1 = ImageTk.PhotoImage(image)
 
 image = Image.open("2.png")
-digit2 = ImageTk.PhotoImage(image)
+mine2 = ImageTk.PhotoImage(image)
 
 image = Image.open("3.png")
-digit3 = ImageTk.PhotoImage(image)
+mine3 = ImageTk.PhotoImage(image)
 
 image= Image.open("4.png")
-digit4 = ImageTk.PhotoImage(image)
+mine4 = ImageTk.PhotoImage(image)
 
 image = Image.open("5.png")
-digit5 = ImageTk.PhotoImage(image)
+mine5 = ImageTk.PhotoImage(image)
 
 image = Image.open("6.png")
-digit6 = ImageTk.PhotoImage(image)
+mine6 = ImageTk.PhotoImage(image)
 
 image = Image.open("7.png")
-digit7 = ImageTk.PhotoImage(image)
+mine7 = ImageTk.PhotoImage(image)
 
 image = Image.open("8.png")
+mine8 = ImageTk.PhotoImage(image)
+
+image = Image.open("_0.png")
+digit0 = ImageTk.PhotoImage(image)
+
+image = Image.open("_1.png")
+digit1 = ImageTk.PhotoImage(image)
+
+image = Image.open("_2.png")
+digit2 = ImageTk.PhotoImage(image)
+
+image = Image.open("_3.png")
+digit3 = ImageTk.PhotoImage(image)
+
+image= Image.open("_4.png")
+digit4 = ImageTk.PhotoImage(image)
+
+image = Image.open("_5.png")
+digit5 = ImageTk.PhotoImage(image)
+
+image = Image.open("_6.png")
+digit6 = ImageTk.PhotoImage(image)
+
+image = Image.open("_7.png")
+digit7 = ImageTk.PhotoImage(image)
+
+image = Image.open("_8.png")
 digit8 = ImageTk.PhotoImage(image)
+
+image = Image.open("_9.png")
+digit9 = ImageTk.PhotoImage(image)
 
 image = Image.open("flag.png")
 flag = ImageTk.PhotoImage(image)
@@ -48,6 +78,8 @@ grid=[ [0 for i in range (20)] for j in range(20)]
 global playerGrid
 playerGrid=[ [11 for i in range (20)] for j in range(20)]
 
+
+
 mines = 0
 
 while mines != 50:
@@ -56,6 +88,12 @@ while mines != 50:
     if grid[x][y] == 0:
         mines += 1
         grid[x][y] = 9 #Les 9 sont des mines, les autres chiffres sont le nombre de mines qui entourent la case
+
+global mineCountdown
+mineCountdown = mines
+
+can.create_image(25 * 50, 10 * 50, anchor = NW, image=digit5)
+can.create_image(25 * 50 + 50, 10 * 50, anchor = NW, image=digit0)
 
 def drawGrid():
     for j in range(20):
@@ -108,16 +146,25 @@ def mines(i, j):
     
     
 def rightClick(evt):
+
+    global mineCountdown
+    
     j = int(evt.x / 50)
     i = int(evt.y / 50)
     if playerGrid[i][j] == "flag":
         playerGrid[i][j] = 11
         can.create_image(j * 50, i * 50, anchor = NW, image=gridTexture)
+        mineCountdown += 1
         
     elif playerGrid[i][j] == 11:
         can.create_image(j * 50, i * 50, anchor = NW, image=flag)
         playerGrid[i][j] = "flag"
+        mineCountdown -= 1
 
+    showMinesLeft()
+
+    
+    
 def leftClick(evt):
     j = int(evt.x / 50)
     i = int(evt.y / 50)
@@ -127,33 +174,81 @@ def leftClick(evt):
     else:
         printMines(i, j)
 
+def showMinesLeft():
+
+    firstDigit = mineCountdown/10
+    lastDigit = mineCountdown%10
+    
+    if firstDigit == 9:
+        can.create_image(25 * 50, 10 * 50, anchor = NW, image=digit9)
+    elif firstDigit == 8:
+        can.create_image(25 * 50, 10 * 50, anchor = NW, image=digit8)
+    elif firstDigit == 7:
+        can.create_image(25 * 50, 10 * 50, anchor = NW, image=digit7)
+    elif firstDigit == 6:
+        can.create_image(25 * 50, 10 * 50, anchor = NW, image=digit6)
+    elif firstDigit == 5:
+        can.create_image(25 * 50, 10 * 50, anchor = NW, image=digit5)
+    elif firstDigit == 4:
+        can.create_image(25 * 50, 10 * 50, anchor = NW, image=digit4)
+    elif firstDigit == 3:
+        can.create_image(25 * 50, 10 * 50, anchor = NW, image=digit3)
+    elif firstDigit ==2:
+        can.create_image(25 * 50, 10 * 50, anchor = NW, image=digit2)
+    elif firstDigit == 1:
+        can.create_image(25 * 50, 10 * 50, anchor = NW, image=digit1)
+    elif firstDigit == 0:
+        can.create_image(25 * 50, 10 * 50, anchor = NW, image=digit0)
+
+    if lastDigit == 9:
+        can.create_image(25 * 50 + 50, 10 * 50, anchor = NW, image=digit9)
+    elif lastDigit == 8:
+        can.create_image(25 * 50 + 50, 10 * 50, anchor = NW, image=digit8)
+    elif lastDigit == 7:
+        can.create_image(25 * 50 + 50, 10 * 50, anchor = NW, image=digit7)
+    elif lastDigit == 6:
+        can.create_image(25 * 50 + 50, 10 * 50, anchor = NW, image=digit6)
+    elif lastDigit == 5:
+        can.create_image(25 * 50 + 50, 10 * 50, anchor = NW, image=digit5)
+    elif lastDigit == 4:
+        can.create_image(25 * 50 + 50, 10 * 50, anchor = NW, image=digit4)
+    elif lastDigit == 3:
+        can.create_image(25 * 50 + 50, 10 * 50, anchor = NW, image=digit3)
+    elif lastDigit == 2:
+        can.create_image(25 * 50 + 50, 10 * 50, anchor = NW, image=digit2)
+    elif lastDigit == 1:
+        can.create_image(25 * 50 + 50, 10 * 50, anchor = NW, image=digit1)
+    elif lastDigit == 0:
+        can.create_image(25 * 50 + 50, 10 * 50, anchor = NW, image=digit0)
+
+    
 def printMines(i, j):
 
     x = grid[i][j]
 
     if x == 1:
-        can.create_image(j * 50, i * 50, anchor = NW, image=digit1)
+        can.create_image(j * 50, i * 50, anchor = NW, image=mine1)
         playerGrid[i][j] = 1
     if x == 2:
-        can.create_image(j * 50, i * 50, anchor = NW, image=digit2)
+        can.create_image(j * 50, i * 50, anchor = NW, image=mine2)
         playerGrid[i][j] = 2
     if x == 3:
-        can.create_image(j * 50, i * 50, anchor = NW, image=digit3)
+        can.create_image(j * 50, i * 50, anchor = NW, image=mine3)
         playerGrid[i][j] = 3
     if x == 4:
-        can.create_image(j * 50, i * 50, anchor = NW, image=digit4)
+        can.create_image(j * 50, i * 50, anchor = NW, image=mine4)
         playerGrid[i][j] = 4
     if x == 5:
-        can.create_image(j * 50, i * 50, anchor = NW, image=digit5)
+        can.create_image(j * 50, i * 50, anchor = NW, image=mine5)
         playerGrid[i][j] = 5
     if x == 6:
-        can.create_image(j * 50, i * 50, anchor = NW, image=digit6)
+        can.create_image(j * 50, i * 50, anchor = NW, image=mine6)
         playerGrid[i][j] = 6
     if x == 7:
-        can.create_image(j * 50, i * 50, anchor = NW, image=digit7)
+        can.create_image(j * 50, i * 50, anchor = NW, image=mine7)
         playerGrid[i][j] = 7
     if x == 8:
-        can.create_image(j * 50, i * 50, anchor = NW, image=digit8)
+        can.create_image(j * 50, i * 50, anchor = NW, image=mine8)
         playerGrid[i][j] = 8
     if x == 9:
         playerGrid[i][j] = 9
@@ -166,7 +261,7 @@ def whatDigit(i, j):
 
 def spread(i ,j):
 
-    can.create_image(j * 50, i * 50, anchor = NW, image=digit0)
+    can.create_image(j * 50, i * 50, anchor = NW, image=mine0)
     if playerGrid[i][j] !=0:
         
         playerGrid[i][j] = 0
