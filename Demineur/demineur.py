@@ -111,8 +111,10 @@ def rightClick(evt):
     j = int(evt.x / 50)
     i = int(evt.y / 50)
     if playerGrid[i][j] == "flag":
+        playerGrid[i][j] = 11
         can.create_image(j * 50, i * 50, anchor = NW, image=gridTexture)
-    else:
+        
+    elif playerGrid[i][j] == 11:
         can.create_image(j * 50, i * 50, anchor = NW, image=flag)
         playerGrid[i][j] = "flag"
 
@@ -131,21 +133,30 @@ def printMines(i, j):
 
     if x == 1:
         can.create_image(j * 50, i * 50, anchor = NW, image=digit1)
+        playerGrid[i][j] = 1
     if x == 2:
         can.create_image(j * 50, i * 50, anchor = NW, image=digit2)
+        playerGrid[i][j] = 2
     if x == 3:
         can.create_image(j * 50, i * 50, anchor = NW, image=digit3)
+        playerGrid[i][j] = 3
     if x == 4:
         can.create_image(j * 50, i * 50, anchor = NW, image=digit4)
+        playerGrid[i][j] = 4
     if x == 5:
         can.create_image(j * 50, i * 50, anchor = NW, image=digit5)
+        playerGrid[i][j] = 5
     if x == 6:
         can.create_image(j * 50, i * 50, anchor = NW, image=digit6)
+        playerGrid[i][j] = 6
     if x == 7:
         can.create_image(j * 50, i * 50, anchor = NW, image=digit7)
+        playerGrid[i][j] = 7
     if x == 8:
         can.create_image(j * 50, i * 50, anchor = NW, image=digit8)
+        playerGrid[i][j] = 8
     if x == 9:
+        playerGrid[i][j] = 9
         can.create_image(j * 50, i * 50, anchor = NW, image=mineTexture)
 
 
