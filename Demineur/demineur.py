@@ -119,11 +119,6 @@ def rightClick(evt):
 def leftClick(evt):
     j = int(evt.x / 50)
     i = int(evt.y / 50)
-    can.create_image(j * 50, i * 50, anchor = NW, image=gridTexture)
-
-def leftClick(evt):
-    j = int(evt.x / 50)
-    i = int(evt.y / 50)
     x = whatDigit(i, j)
     if x == 0:
         spread(i,j)
