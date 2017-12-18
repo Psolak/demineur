@@ -30,6 +30,10 @@ class Assets:
                 self.values.append(ImageTk.PhotoImage(Image.open(asset_path)))
         self.mine = ImageTk.PhotoImage(
             Image.open(join(self.folder, "mine.png")))
+        self.red_mine = ImageTk.PhotoImage(
+            Image.open(join(self.folder, "red_mine.png")))
+        self.crossed_mine = ImageTk.PhotoImage(
+            Image.open(join(self.folder, "crossed_mine.png")))
         self.grid = ImageTk.PhotoImage(
             Image.open(join(self.folder, "grid.png")))
         self.flag = ImageTk.PhotoImage(
@@ -38,6 +42,10 @@ class Assets:
             Image.open(join(self.folder, "smiley.png")))
         self.smiley_down = ImageTk.PhotoImage(
             Image.open(join(self.folder, "smiley_down.png")))
+        self.smiley_tensed = ImageTk.PhotoImage(
+            Image.open(join(self.folder, "smiley_tensed.png")))
+        self.smiley_dead = ImageTk.PhotoImage(
+            Image.open(join(self.folder, "smiley_dead.png")))
 
 
 class Demineur:
@@ -83,15 +91,24 @@ class Demineur:
         self.canvas = Canvas(self.game_frame, width=self.sprite_size*self.grid_size, height=self.sprite_size*self.grid_size)
         self.canvas.grid()
         self.draw_grid()
-        self.canvas.bind("<Button-1>", self.left_click)
+        self.canvas.bind("<Button-1>", self.left_click0)
+        self.canvas.bind("<ButtonRelease-1>", self.left_click)
         self.canvas.bind("<Button-3>", self.right_click)
         self.start_time = datetime.datetime.now()
 
-    def show_mines(self):
+    def show_mines(self,x ,y):
         for i in range(self.grid_size):
             for j in range(self.grid_size):
-                if self.grid.mat[i][j] == 9:
+                
+                if self.player_grid[i][j] == -2:
+                    if self.grid.mat[i][j] != 9:
+                        self.canvas.create_image(j * self.sprite_size, i * self.sprite_size, anchor=NW, image=self.assets.crossed_mine)
+
+                elif self.grid.mat[i][j] == 9:
                     self.canvas.create_image(j * self.sprite_size, i * self.sprite_size, anchor=NW, image=self.assets.mine)
+
+        self.canvas.create_image(y * self.sprite_size, x * self.sprite_size, anchor=NW, image=self.assets.red_mine) 
+                        
 
 
     def setup_window(self):
@@ -122,23 +139,36 @@ class Demineur:
         if askyesno("New game ?", "Commencer une nouvelle partie ?"):
             self.start_game()
 
+
+    def left_click0(self, event):
+        
+        j, i = int(event.x / 50), int(event.y / 50)
+        if self.player_grid[i][j] != -1:
+            return
+        else:
+            self.canvas.create_image(j * self.sprite_size, i * self.sprite_size, anchor=NW, image=self.assets.values[0])
+            self.canvas2.create_image(self.sprite_size*self.grid_size/2, 25, image=self.assets.smiley_tensed)
+        
     def left_click(self, event):
+        self.canvas2.create_image(self.sprite_size*self.grid_size/2, 25, image=self.assets.smiley)
         j, i = int(event.x / 50), int(event.y / 50)
         if self.player_grid[i][j] == -2:
             return
         if not self.grid.mat[i][j]:
             self.spread(i, j)
         elif self.grid.mat[i][j] == self.grid.mine:
-            self.player_loses()
+            self.player_loses(i, j)
         else:
             self.update_grid(i, j)
 
-    def player_loses(self):
-        self.show_mines()
+    def player_loses(self, x ,y):
+        self.canvas2.create_image(self.sprite_size*self.grid_size/2, 25, image=self.assets.smiley_dead)
+        self.show_mines(x, y)
         if askyesno("Game Over!", "Voulez-vous commencer une nouvelle partie ?"):
             self.start_game()
         else:
-            pass
+            self.root.destroy()
+
 
     def spread(self, x, y):
         for i in range(x - 1, x + 2):
@@ -167,7 +197,8 @@ class Demineur:
 
     def right_click(self, event):
         j, i = int(event.x / 50), int(event.y / 50)
-        if self.player_grid[i][j] == -1:
+        
+        if self.player_grid[i][j] == -1 and self.number_mines > 0:
             self.canvas.create_image(
                 j * self.sprite_size, i * self.sprite_size, anchor=NW, image=self.assets.flag)
             self.player_grid[i][j] = -2
